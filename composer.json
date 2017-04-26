@@ -1,0 +1,21 @@
+{
+  "name": "ivancli/item_generator",
+  "description": "This is an Item Genarator created for generating multiple items in SpotLite",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Ivan Li",
+      "email": "ivan.li@hotmail.com"
+    }
+  ],
+  "require": {
+    "php": "^5.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "IvanCLI\\ItemGenerator\\": "src/Parser/"
+    }
+  },
+  "minimum-stability": "dev"
+}
