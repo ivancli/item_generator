@@ -10,11 +10,11 @@
     }
   ],
   "require": {
-    
+
   },
   "autoload": {
     "psr-4": {
-      "IvanCLI\\ItemGenerator\\": "src/Parser/"
+      "IvanCLI\\ItemGenerator\\": "src/ItemGenerator/"
     }
   },
   "minimum-stability": "dev"
