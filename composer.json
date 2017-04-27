@@ -10,12 +10,11 @@
     }
   ],
   "require": {
-    "symfony/dom-crawler": "^3.3@dev"
+    "symfony/dom-crawler": "3.3.x-dev"
   },
   "autoload": {
     "psr-4": {
       "IvanCLI\\ItemGenerator\\": "src/ItemGenerator/"
     }
-  },
-  "minimum-stability": "dev"
+  }
 }
