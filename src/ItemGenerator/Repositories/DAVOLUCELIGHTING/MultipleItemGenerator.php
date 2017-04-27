@@ -2,17 +2,17 @@
 /**
  * Created by PhpStorm.
  * User: ivan.li
- * Date: 4/26/2017
- * Time: 4:29 PM
+ * Date: 4/27/2017
+ * Time: 2:47 PM
  */
 
-namespace IvanCLI\ItemGenerator\Repositories;
+namespace IvanCLI\ItemGenerator\Repositories\DAVOLUCELIGHTING;
 
 
 use IvanCLI\ItemGenerator\Contracts\ItemGenerator;
 use Symfony\Component\DomCrawler\Crawler;
 
-class WwwDavolucelightingComAu extends ItemGenerator
+class MultipleItemGenerator extends ItemGenerator
 {
     const LABEL_XPATH = "//*[starts-with(@name, 'product_options')]/../preceding-sibling::*";
     const SELECT_XPATH = "//*[starts-with(@name, 'product_options')]";
