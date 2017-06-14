@@ -102,30 +102,25 @@ class MultipleItemGenerator extends ItemGenerator
      * @param array $group
      * @param null $value
      * @param int $i
+     * @param null $label
      * @return array
      */
-    public function combinations(array $data, array &$all = array(), array $group = array(), $value = null, $i = 0)
+    public function combinations(array $data, array &$all = array(), array $group = array(), $value = null, $i = 0, $label = null)
     {
-        dd($data);
-        $keys = array_keys($data);
-        if (isset($value) === true) {
-            if (!is_null($label)) {
-                array_set($group, $label, $value);
-            } else {
-                array_push($group, $value);
-            }
+        $data = array_first($data);
+        $options = $data->options;
+        $targetItems = [];
+        $targetItem = [];
+        foreach ($options as $option) {
+
+            $attributes = new \stdClass();
+            $attributes->value = $option->text;
+            $attributes->text = $option->text;
+            $targetItem[$data->label] = $attributes;
+            $targetItems[] = $targetItem;
         }
 
-        if ($i >= count($data)) {
-            array_push($all, $group);
-        } else {
-            $currentKey = $keys[$i];
-            $currentElement = $data[$currentKey];
-            foreach ($currentElement->options as $val) {
-                $this->combinations($data, $all, $group, $val, $i + 1, $currentElement->label);
-            }
-        }
-
-        $this->items = $all;
+        $this->items = $targetItems;
+        return $this->items;
     }
 }
