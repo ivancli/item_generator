@@ -38,14 +38,14 @@ class MultipleItemGenerator extends ItemGenerator
      */
     public function hasMultipleItems()
     {
-        if (!is_null($this->content) && !empty($this->content)) {
-            $crawler = new Crawler($this->content);
-            $xpathNodes = $crawler->filterXPath(self::MULTIPLE_ITEMS_DETECT_XPATH);
-            if ($xpathNodes->count() > 1) {
-                return true;
-            }
-        }
-        return false;
+//        if (!is_null($this->content) && !empty($this->content)) {
+//            $crawler = new Crawler($this->content);
+//            $xpathNodes = $crawler->filterXPath(self::MULTIPLE_ITEMS_DETECT_XPATH);
+//            if ($xpathNodes->count() > 1) {
+//                return true;
+//            }
+//        }
+//        return false;
     }
 
     /**
@@ -54,7 +54,7 @@ class MultipleItemGenerator extends ItemGenerator
      */
     public function extractOptions()
     {
-        if ($this->hasMultipleItems()) {
+//        if ($this->hasMultipleItems()) {
             if (!is_null($this->content) && !empty($this->content)) {
                 $crawler = new Crawler($this->content);
                 $xpathNodes = $crawler->filterXPath(self::MULTIPLE_ITEMS_DETECT_XPATH);
@@ -84,9 +84,9 @@ class MultipleItemGenerator extends ItemGenerator
                 $this->options = $items;
             }
             return true;
-        } else {
-            return false;
-        }
+//        } else {
+//            return false;
+//        }
     }
 
     /**
