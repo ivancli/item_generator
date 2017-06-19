@@ -6,7 +6,7 @@
  * Time: 2:16 PM
  */
 
-namespace IvanCLI\Parser\Repositories\IKEA;
+namespace IvanCLI\ItemGenerator\Repositories\IKEA;
 
 
 use IvanCLI\ItemGenerator\Contracts\ItemGenerator;
