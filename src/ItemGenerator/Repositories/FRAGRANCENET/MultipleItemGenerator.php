@@ -78,7 +78,6 @@ class MultipleItemGenerator extends ItemGenerator
     public function extractOptions()
     {
         $this->__getProductInfo();
-        dd($this->products);
         $items = [];
         foreach ($this->products as $product) {
             $item = [];
