@@ -22,8 +22,8 @@ class MultipleItemGenerator extends ItemGenerator
     protected $productInfo;
 
     const LABELS_XPATH = '//dt/label';
-    const SELECTS_XPATH = '//*[contains(@class, "product-custom-option")]';
-    const OPTIONS_XPATH = '//option[@value!=""]';
+    const SELECTS_XPATH = '//*[contains(@class, "product-custom-option")]|//*[contains(@class, "super-attribute-select")]';
+    const OPTIONS_XPATH = '//option';
     const SELECTS_CONTAINER_XPATH = '//*[@id="product-options-wrapper"]//dl';
 
 
@@ -58,28 +58,32 @@ class MultipleItemGenerator extends ItemGenerator
         $crawler = new Crawler($this->content);
 
         $selectContainers = $crawler->filterXPath(self::SELECTS_CONTAINER_XPATH);
-
         if ($selectContainers->count() > 0) {
-            $selectContainer = $selectContainers->first();
-            $labelNodes = $selectContainer->filterXPath(self::LABELS_XPATH);
-            $selectNodes = $selectContainer->filterXPath(self::SELECTS_XPATH);
             $items = [];
+            $selectContainers->each(function (Crawler $selectContainer) use (&$items) {
+                $labelNodes = $selectContainer->filterXPath(self::LABELS_XPATH);
+                $selectNodes = $selectContainer->filterXPath(self::SELECTS_XPATH);
 
-            $selectNodes->each(function (Crawler $selectNode, $index) use ($labelNodes, &$items) {
-                $item = new \stdClass();
-                $labelNode = $labelNodes->getNode($index);
-                $item->label = $labelNode->textContent;
-                $item->options = [];
+                $selectNodes->each(function (Crawler $selectNode, $index) use ($labelNodes, &$items) {
+                    $item = new \stdClass();
+                    $labelNode = $labelNodes->getNode($index);
+                    $item->label = $labelNode->textContent;
+                    $item->options = [];
 
-                $optionNodes = $selectNode->filterXPath(self::OPTIONS_XPATH);
-                $optionNodes->each(function (Crawler $optionNode) use (&$item) {
-                    $newOption = new \stdClass();
-                    $newOption->text = $optionNode->text();
-                    $newOption->value = $optionNode->attr("value");
-                    $item->options[] = $newOption;
+                    $optionNodes = $selectNode->filterXPath(self::OPTIONS_XPATH);
+                    dump($optionNodes->count());
+                    $optionNodes->each(function (Crawler $optionNode) use (&$item) {
+                        if (!empty($optionNode->attr("value"))) {
+                            $newOption = new \stdClass();
+                            $newOption->text = $optionNode->text();
+                            $newOption->value = $optionNode->attr("value");
+                            $item->options[] = $newOption;
+                        }
+                    });
+                    $items[] = $item;
                 });
-                $items[] = $item;
             });
+            dd($items);
             $this->options = $items;
         }
 
@@ -101,6 +105,7 @@ class MultipleItemGenerator extends ItemGenerator
      */
     public function getItems()
     {
+        dd($this->items);
         return $this->items;
     }
 
