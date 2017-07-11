@@ -11,6 +11,7 @@ namespace IvanCLI\ItemGenerator\Repositories\LIGHTS2YOU;
 
 use IvanCLI\ItemGenerator\Contracts\ItemGenerator;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\VarDumper\Dumper\DataDumperInterface;
 
 class MultipleItemGenerator extends ItemGenerator
 {
@@ -21,10 +22,7 @@ class MultipleItemGenerator extends ItemGenerator
 
     protected $productInfo;
 
-    const LABELS_XPATH = '//dt/label';
-    const SELECTS_XPATH = '//*[contains(@class, "product-custom-option")]|//*[contains(@class, "super-attribute-select")]';
-    const OPTIONS_XPATH = '//option';
-    const SELECTS_CONTAINER_XPATH = '//*[@id="product-options-wrapper"]//dl';
+    const PRODUCT_INFO_REGEX = '#var spConfig = new Product.Config\((.*?)\);#';
 
 
     /**
@@ -43,10 +41,11 @@ class MultipleItemGenerator extends ItemGenerator
      */
     public function hasMultipleItems()
     {
-//        if (!is_null($this->productInfo) && count($this->productInfo) > 1) {
-//            return true;
-//        }
-//        return false;
+        $this->__getProductInfo();
+        if (!is_null($this->productInfo) && isset($this->productInfo->attributes) && count($this->productInfo->attributes) > 0) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -55,39 +54,44 @@ class MultipleItemGenerator extends ItemGenerator
      */
     public function extractOptions()
     {
-        $crawler = new Crawler($this->content);
-
-        $selectContainers = $crawler->filterXPath(self::SELECTS_CONTAINER_XPATH);
-        if ($selectContainers->count() > 0) {
-            $items = [];
-            $selectContainers->each(function (Crawler $selectContainer) use (&$items) {
-                $labelNodes = $selectContainer->filterXPath(self::LABELS_XPATH);
-                $selectNodes = $selectContainer->filterXPath(self::SELECTS_XPATH);
-
-                $selectNodes->each(function (Crawler $selectNode, $index) use ($labelNodes, &$items) {
-                    $item = new \stdClass();
-                    $labelNode = $labelNodes->getNode($index);
-                    $item->label = $labelNode->textContent;
-                    $item->options = [];
-
-                    $optionNodes = $selectNode->filterXPath(self::OPTIONS_XPATH);
-                    dump($optionNodes->count());
-                    $optionNodes->each(function (Crawler $optionNode) use (&$item) {
-                        if (!empty($optionNode->attr("value"))) {
-                            $newOption = new \stdClass();
-                            $newOption->text = $optionNode->text();
-                            $newOption->value = $optionNode->attr("value");
-                            $item->options[] = $newOption;
+        if ($this->hasMultipleItems()) {
+            /*collecting product ids*/
+            $productIds = [];
+            foreach ($this->productInfo->attributes as $attribute) {
+                $options = $attribute->options;
+                foreach ($options as $option) {
+                    $products = $option->products;
+                    foreach ($products as $product) {
+                        if (!in_array($product, $productIds)) {
+                            $productIds[] = $product;
                         }
-                    });
-                    $items[] = $item;
-                });
-            });
-            dd($items);
-            $this->options = $items;
-        }
+                    }
+                }
+            }
 
-        return true;
+            $items = [];
+
+            foreach ($productIds as $productId) {
+                $item = [];
+                foreach ($this->productInfo->attributes as $attribute) {
+                    foreach ($attribute->options as $option) {
+                        if (in_array($productId, $option->products)) {
+                            if (!isset($item[$attribute->label])) {
+                                $item[$attribute->label] = new \stdClass();
+                            }
+                            $item[$attribute->label]->text = $option->label;
+                            $item[$attribute->label]->value = $option->id;
+                            break;
+                        }
+                    }
+                }
+                $items[] = $item;
+            }
+            $this->options = $items;
+
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -105,7 +109,6 @@ class MultipleItemGenerator extends ItemGenerator
      */
     public function getItems()
     {
-        dd($this->items);
         return $this->items;
     }
 
@@ -121,25 +124,22 @@ class MultipleItemGenerator extends ItemGenerator
      */
     public function combinations(array $data, array &$all = array(), array $group = array(), $value = null, $i = 0, $label = null)
     {
-        $keys = array_keys($data);
-        if (isset($value) === true) {
-            if (!is_null($label)) {
-                array_set($group, $label, $value);
-            } else {
-                array_push($group, $value);
+        $this->items = $this->options;
+        return $this->items;
+    }
+
+    private function __getProductInfo()
+    {
+        if (!is_null($this->content) && !empty($this->content)) {
+            preg_match(self::PRODUCT_INFO_REGEX, $this->content, $matches);
+            if (isset($matches[1])) {
+                $productInfo = json_decode($matches[1]);
+                if (!is_null($productInfo) && json_last_error() === JSON_ERROR_NONE) {
+                    $this->productInfo = $productInfo;
+                    return $this->productInfo;
+                }
             }
         }
-
-        if ($i >= count($data)) {
-            array_push($all, $group);
-        } else {
-            $currentKey = $keys[$i];
-            $currentElement = $data[$currentKey];
-            foreach ($currentElement->options as $val) {
-                $this->combinations($data, $all, $group, $val, $i + 1, $currentElement->label);
-            }
-        }
-
-        $this->items = $all;
+        return null;
     }
 }
