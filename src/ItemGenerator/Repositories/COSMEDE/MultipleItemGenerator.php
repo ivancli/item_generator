@@ -51,26 +51,26 @@ class MultipleItemGenerator extends ItemGenerator
      */
     public function extractOptions()
     {
-        if ($this->hasMultipleItems()) {
-            if (!is_null($this->content) && !empty($this->content)) {
-                $crawler = new Crawler($this->content);
-                $xpathNodes = $crawler->filterXPath(self::PRODUCT_NAME_XPATH);
-                $items = [];
-                $xpathNodes->each(function (Crawler $xpathNode) use (&$items) {
-                    $productName = $xpathNode->text();
+//        if ($this->hasMultipleItems()) {
+        if (!is_null($this->content) && !empty($this->content)) {
+            $crawler = new Crawler($this->content);
+            $xpathNodes = $crawler->filterXPath(self::PRODUCT_NAME_XPATH);
+            $items = [];
+            $xpathNodes->each(function (Crawler $xpathNode) use (&$items) {
+                $productName = $xpathNode->text();
 
-                    $item = [];
-                    $item["Variant"] = new \stdClass();
-                    $item["Variant"]->text = $productName;
-                    $item["Variant"]->value = $productName;
-                    $items[] = $item;
-                });
-                $this->options = $items;
-            }
-            return true;
-        } else {
-            return false;
+                $item = [];
+                $item["Variant"] = new \stdClass();
+                $item["Variant"]->text = $productName;
+                $item["Variant"]->value = $productName;
+                $items[] = $item;
+            });
+            $this->options = $items;
         }
+        return true;
+//        } else {
+//            return false;
+//        }
     }
 
     /**
