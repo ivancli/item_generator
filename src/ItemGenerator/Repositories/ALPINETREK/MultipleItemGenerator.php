@@ -63,10 +63,11 @@ class MultipleItemGenerator extends ItemGenerator
      */
     public function hasMultipleItems()
     {
-//        if (!is_null($this->productInfo) && count($this->productInfo) > 1) {
-//            return true;
-//        }
-//        return false;
+        $this->__getProductInfo();
+        if (!is_null($this->productInfo)) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -75,17 +76,19 @@ class MultipleItemGenerator extends ItemGenerator
      */
     public function extractOptions()
     {
-        $this->__getProductInfo();
-        $items = [];
-        foreach ($this->productInfo as $product) {
-            $item = [];
-            $item['Variant'] = new \stdClass();
-            $item['Variant']->text = $product->name;
-            $item['Variant']->value = $product->sku;
-            $items[] = $item;
+        if ($this->hasMultipleItems()) {
+            $items = [];
+            foreach ($this->productInfo as $product) {
+                $item = [];
+                $item['Variant'] = new \stdClass();
+                $item['Variant']->text = $product->name;
+                $item['Variant']->value = $product->sku;
+                $items[] = $item;
+            }
+            $this->options = $items;
+            return true;
         }
-        $this->options = $items;
-        return true;
+        return false;
     }
 
     /**
