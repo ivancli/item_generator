@@ -57,8 +57,8 @@ class MultipleItemGenerator extends ItemGenerator
             foreach ($this->productInfo as $productOption) {
                 $item = [];
                 $item['variant'] = new \stdClass();
-                $item['variant']->text = $productOption->name;
-                $item['variant']->value = $productOption->id;
+                $item['variant']->text = $productOption->sku;
+                $item['variant']->value = $productOption->sku;
                 $items[] = $item;
             }
             $this->options = $items;
